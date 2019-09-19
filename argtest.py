@@ -1,9 +1,11 @@
+#!/usr/bin/env python
 
 import argparse
 import os.path
 import sys
 import logging
 import requests
+import json
 
 logging.basicConfig()
 logging.root.setLevel(logging.NOTSET)
@@ -39,17 +41,32 @@ parser.add_argument(
     help="-w --worker Number of workers to requestes",
     default=1
 )
-'''
+
 parser.add_argument(
-    "-h",
-    "--headers",
+    "-s",
+    "--set-header",
     type=str,
     dest="nam_headers",
-    help="-h --headers Number of workers to requestes",
+    help="-s --set-header Headers in format json ex: '{\"Content-type\":\"application/json\"}'",
+    default='{}',
 )
-'''
+
 
 args = parser.parse_args()
+
+
+def validate_headers(js_data):
+
+    try:
+        json.loads(js_data)
+        return True
+    except ValueError as error:
+        logging.ERROR("Error to load parameter --set-header in json type")
+        return False
+    except TypeError as error:
+        logging.ERROR("Error to load parameter --set-header in json type")
+
+    #return False
 
 
 def call_request_post(url_data, headers_data, data_data):
@@ -77,8 +94,18 @@ if not os.path.isfile(args.nam_file):
     logging.ERROR('Err: file %s not found' % args.nam_file)
     sys.exit(1)
 
+#if args.nam_headers:
+#    print "entrou aqui"
+a = validate_headers(args.nam_headers)
+print a
+print 'deu bosta aqui'
+    #sys.exit(1)
+#else:
+#   print "deu else"
 
-with open(args.nam_file, "r") as fd:
+sys.exit(1)
+
+with open(ags.nam_file, "r") as fd:
 
     #lines = fd.read().splitlines()
     for line in fd:
