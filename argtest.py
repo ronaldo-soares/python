@@ -5,7 +5,7 @@ import os.path
 import sys
 import logging
 import requests
-import json
+#import json
 
 logging.basicConfig()
 logging.root.setLevel(logging.NOTSET)
@@ -54,19 +54,38 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+'''
+def is_json(myjson):
+    try:
+        json_object = json.loads(myjson)
+    except ValueError as e:
+        return False
+    return True
 
 def validate_headers(js_data):
 
     try:
-        json.loads(js_data)
+        json.dumps(js_data)
         return True
     except ValueError as error:
-        logging.ERROR("Error to load parameter --set-header in json type")
+    #except simplejson.decoder.JSONDecodeError:
+        logging.ERROR("Error to load parameter --set-header in json value")
         return False
-    except TypeError as error:
-        logging.ERROR("Error to load parameter --set-header in json type")
+    #except TypeError as error:
+    #    logging.ERROR("Error to load parameter --set-header in json type")
+    #except simplejson.decoder.JSONDecodeError:
 
     #return False
+'''
+def is_dict(a_dict):
+    if not type(a_dict) is 'dict':
+        print "as not dict"
+        return False
+    return True
+
+
+
+
 
 
 def call_request_post(url_data, headers_data, data_data):
@@ -94,28 +113,21 @@ if not os.path.isfile(args.nam_file):
     logging.ERROR('Err: file %s not found' % args.nam_file)
     sys.exit(1)
 
-#if args.nam_headers:
-#    print "entrou aqui"
-a = validate_headers(args.nam_headers)
-print a
-print 'deu bosta aqui'
-    #sys.exit(1)
-#else:
-#   print "deu else"
+#if not is_json(args.nam_headers):
+#    logging.ERROR("Error to load parameter --set-header in json value")
+#    sys.exit(1)
 
-sys.exit(1)
 
-with open(ags.nam_file, "r") as fd:
+with open(args.nam_file, "r") as fd:
 
     #lines = fd.read().splitlines()
     for line in fd:
         line = line.strip()
         #logging.info('bucetada - %s - bucetada' % line)
-        headers = {'Content-type': 'application/json'}
-        response = call_request_post(line, headers, "data")
+        #headers = {'Content-type': 'application/json'}
+
+        response = call_request_post(line, eval(args.nam_headers), "data")
         #response = line + "Content-type: application/json" + '{"key":"value"}'
         logging.info("Sending call to %s with response: %s" % (line,response))
-
-
 
 
