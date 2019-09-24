@@ -78,7 +78,7 @@ def validate_headers(js_data):
     #return False
 '''
 def is_dict(a_dict):
-    if not type(a_dict) is 'dict':
+    if not type(a_dict).__name__ == 'dict':
         print "as not dict"
         return False
     return True
