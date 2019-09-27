@@ -5,12 +5,20 @@ import os.path
 import sys
 import logging
 import requests
-#import json
+import json
 
 logging.basicConfig()
 logging.root.setLevel(logging.NOTSET)
 logging.basicConfig(level=logging.NOTSET)
 #logger = logging.getLogger("my-app")
+
+class StoreDictKeyPair(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        my_dict = {}
+        for kv in values.split(","):
+            k, v = kv.split("=")
+            my_dict[k] = v
+        setattr(namespace, self.dest, my_dict)
 
 parser = argparse.ArgumentParser(
     usage="usage aqui",
@@ -46,46 +54,22 @@ parser.add_argument(
     "-s",
     "--set-header",
     type=str,
+#    action=StoreDictKeyPair,
     dest="nam_headers",
-    help="-s --set-header Headers in format json ex: '{\"Content-type\":\"application/json\"}'",
+    help="-s --set-header Headers in format json ex: ",
     default='{}',
 )
 
 
 args = parser.parse_args()
 
-'''
-def is_json(myjson):
+
+def is_json(json_data):
     try:
-        json_object = json.loads(myjson)
+        json_object = json.loads(json_data)
     except ValueError as e:
         return False
     return True
-
-def validate_headers(js_data):
-
-    try:
-        json.dumps(js_data)
-        return True
-    except ValueError as error:
-    #except simplejson.decoder.JSONDecodeError:
-        logging.ERROR("Error to load parameter --set-header in json value")
-        return False
-    #except TypeError as error:
-    #    logging.ERROR("Error to load parameter --set-header in json type")
-    #except simplejson.decoder.JSONDecodeError:
-
-    #return False
-'''
-def is_dict(a_dict):
-    if not type(a_dict).__name__ == 'dict':
-        print "as not dict"
-        return False
-    return True
-
-
-
-
 
 
 def call_request_post(url_data, headers_data, data_data):
@@ -110,12 +94,12 @@ def call_request_post(url_data, headers_data, data_data):
 
 
 if not os.path.isfile(args.nam_file):
-    logging.ERROR('Err: file %s not found' % args.nam_file)
+    print 'Err: file %s not found' % args.nam_file
     sys.exit(1)
 
-#if not is_json(args.nam_headers):
-#    logging.ERROR("Error to load parameter --set-header in json value")
-#    sys.exit(1)
+if not is_json(args.nam_headers):
+    print 'Err: value %s is not valid' % args.nam_headers
+    sys.exit(1)
 
 
 with open(args.nam_file, "r") as fd:
@@ -126,7 +110,8 @@ with open(args.nam_file, "r") as fd:
         #logging.info('bucetada - %s - bucetada' % line)
         #headers = {'Content-type': 'application/json'}
 
-        response = call_request_post(line, eval(args.nam_headers), "data")
+        #response = call_request_post(line, eval(args.nam_headers), "data")
+        response = call_request_post(line, json.loads(args.nam_headers), "data")
         #response = line + "Content-type: application/json" + '{"key":"value"}'
         logging.info("Sending call to %s with response: %s" % (line,response))
 
