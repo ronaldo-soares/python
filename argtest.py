@@ -12,14 +12,6 @@ logging.root.setLevel(logging.NOTSET)
 logging.basicConfig(level=logging.NOTSET)
 #logger = logging.getLogger("my-app")
 
-class StoreDictKeyPair(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        my_dict = {}
-        for kv in values.split(","):
-            k, v = kv.split("=")
-            my_dict[k] = v
-        setattr(namespace, self.dest, my_dict)
-
 parser = argparse.ArgumentParser(
     usage="usage aqui",
     description="description aqui",
@@ -54,7 +46,6 @@ parser.add_argument(
     "-s",
     "--set-header",
     type=str,
-#    action=StoreDictKeyPair,
     dest="nam_headers",
     help="-s --set-header Headers in format json ex: ",
     default='{}',
@@ -104,15 +95,9 @@ if not is_json(args.nam_headers):
 
 with open(args.nam_file, "r") as fd:
 
-    #lines = fd.read().splitlines()
     for line in fd:
         line = line.strip()
-        #logging.info('bucetada - %s - bucetada' % line)
-        #headers = {'Content-type': 'application/json'}
-
-        #response = call_request_post(line, eval(args.nam_headers), "data")
         response = call_request_post(line, json.loads(args.nam_headers), "data")
-        #response = line + "Content-type: application/json" + '{"key":"value"}'
         logging.info("Sending call to %s with response: %s" % (line,response))
 
 
